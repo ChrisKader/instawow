@@ -1,5 +1,6 @@
 import commonjs from "@rollup/plugin-commonjs";
 import json from "@rollup/plugin-json";
+import html from '@rollup/plugin-html';
 import resolve from "@rollup/plugin-node-resolve";
 import svelte from "rollup-plugin-svelte";
 import typescript from "@rollup/plugin-typescript";
@@ -12,9 +13,11 @@ export default [
   {
     input: "src/index.ts",
     output: {
+      dir: "../../.dist",
+      name: 'index',
       sourcemap: !production,
       format: "iife",
-      file: "../src/instawow_gui/frontend/svelte-bundle.js",
+      //file: "svelte-bundle.js",
       exports: "auto",
     },
     plugins: [
@@ -27,7 +30,7 @@ export default [
       }),
       // we'll extract any component CSS out into
       // a separate file - better for performance
-      css({ output: "svelte-bundle.css" }),
+      css({ output: "stylesheet.css" }),
       // If you have external dependencies installed from
       // npm, you'll most likely need these plugins. In
       // some cases you'll need additional configuration -
@@ -41,6 +44,23 @@ export default [
       typescript({
         sourceMap: !production,
         inlineSources: !production,
+      }),
+      html({
+        template: () => { 
+          return `<!DOCTYPE html\n>`+
+                 `<html lang="en">\n` +
+                 `  <head>\n` +
+                 `    <meta charset="utf-8" />\n` +
+                 `    <!-- https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy/script-src -->\n` +
+                 `    <meta http-equiv="Content-Security-Policy" content="script-src 'self';" />\n` +
+                 `    <link rel="stylesheet" href="stylesheet.css" />\n` +
+                 `    <script defer src="index.js"></script>\n` +
+                 `  </head>\n` +
+                 `  <body>\n` +
+                 `    <!--  -->\n` +
+                 `  </body>\n` +
+                 `</html>`
+      }
       }),
       commonjs(),
       json(),

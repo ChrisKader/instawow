@@ -11,7 +11,10 @@
   "private": true,
   "devDependencies": {
     "@fortawesome/free-solid-svg-icons": "^5.15.3",
+    "@open-rpc/schema-utils-js": "^1.16.0",
+    "@open-rpc/server-js": "^1.9.2",
     "@rollup/plugin-commonjs": "^21.0.1",
+    "@rollup/plugin-html": "^0.2.4",
     "@rollup/plugin-json": "^4.1.0",
     "@rollup/plugin-node-resolve": "^13.0.0",
     "@rollup/plugin-typescript": "^8.2.1",

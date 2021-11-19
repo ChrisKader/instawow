@@ -1,6 +1,6 @@
 import type { Client } from "@open-rpc/client-js";
-import lodash from "lodash";
-
+import lodash, { reject, values } from "lodash";
+import { activeProfile, profiles } from "./store";
 export enum Flavour {
   retail = "retail",
   vanilla_classic = "vanilla_classic",
@@ -148,20 +148,50 @@ export type PydanticValidationError = {
   type: string;
 };
 
+export type ApiError = {
+  msg: string,
+  info: {
+    [key: string]: string
+  }
+}
+
+export type StackedTypes = Version|ApiError|Config
+
+export type PromisedTypes = Promise<StackedTypes>
+
+export type ApiParams = {
+  method: string,
+  params: {
+    [key: string]: string
+  }
+}
+
 export class Api {
-  constructor(private clientWrapper: { client: Promise<Client> }, public profile?: string) {}
-
+  constructor( public profile?: string) {}
+  
   withProfile(profile: string) {
-    return new Api(this.clientWrapper, profile);
+    return new Api(profile);
   }
 
-  private async request(requestObject: Parameters<Client["request"]>[0]) {
-    const client = await this.clientWrapper.client;
-    return await client.request(requestObject, 0);
+  private async request(requestObject: ApiParams):Promise<Version|ApiError|Config> {
+
   }
 
-  async readProfile(profile: string): Promise<Config> {
-    return await this.request({ method: "config/read", params: { profile: profile } });
+  async readProfile(profile: string): Config {
+    let returnProfile = {
+      addon_dir: '',
+      auto_update_check: false,
+      config_dir: '',
+      game_flavour: Flavour.retail,
+      profile: '',
+      temp_dir: ''
+    };
+
+    const profileUnsub = profiles.subscribe(values => {
+      returnProfile = values.get(profile) || returnProfile
+    })
+
+    return returnProfile
   }
 
   async writeProfile(config: Config, infer_game_flavour: boolean): Promise<Config> {

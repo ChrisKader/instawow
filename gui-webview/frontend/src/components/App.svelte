@@ -9,7 +9,8 @@
   let installedVersion: string;
   let newVersion: string | null;
 
-  const performInitialSetup = async () => {
+  const performInitialSetup = async (testServer) => {
+    testServer.start()
     ({ installed_version: installedVersion, new_version: newVersion } = await $api.getVersion());
     const profileConfigs = await Promise.allSettled(
       (await $api.listProfiles()).map(async (p) => await $api.readProfile(p))
@@ -23,7 +24,7 @@
   };
 </script>
 
-{#await performInitialSetup()}
+{#await performInitialSetup(testServer)}
   <main>
     <header class="section section__menubar" />
     <section class="section section__main" />
